@@ -1,7 +1,7 @@
 ﻿namespace BrowserDriver.Browsers
 {
 
-    public static class BrowserConnectionFactory
+    public static class BrowserFactory
     {
         public static readonly IBrowserDetector[] Browsers = new IBrowserDetector[] { new ChromeBrowser(), new EdgeBrowser() };
 

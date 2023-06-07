@@ -2,6 +2,7 @@
 
 namespace BrowserDriver.Browsers
 {
+    
     public abstract class BrowserDetector : IBrowserDetector
     {
         public string Name { get; } = string.Empty;

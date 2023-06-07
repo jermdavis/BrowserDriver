@@ -1,6 +1,4 @@
-﻿using Microsoft.Win32;
-
-namespace BrowserDriver.Browsers
+﻿namespace BrowserDriver.Browsers
 {
 
     public class ChromeBrowser : BrowserDetector

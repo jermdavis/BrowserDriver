@@ -17,6 +17,8 @@ namespace BrowserDriver
         private State? _newState = null;
         private bool _running = true;
         private readonly AutoResetEvent _ar = new(initialState: false);
+        private readonly byte[] _byteBuffer = new byte[512];
+        private readonly StringBuilder _messageBuffer = new();
 
         public Dictionary<string, object> State { get; init; } = new Dictionary<string, object>();
 
@@ -52,26 +54,23 @@ namespace BrowserDriver
 
         private async Task Receive()
         {
-            var buffer = new byte[512];
-            var sb = new StringBuilder();
-
             while (_running)
             {
-                sb.Clear();
+                _messageBuffer.Clear();
                 var done = false;
 
                 while (!done)
                 {
-                    var result = await _ws.ReceiveAsync(buffer, _ct.Token);
-                    sb.Append(Encoding.UTF8.GetString(buffer, 0, result.Count));
+                    var result = await _ws.ReceiveAsync(_byteBuffer, _ct.Token);
+                    _messageBuffer.Append(Encoding.UTF8.GetString(_byteBuffer, 0, result.Count));
                     done = result.EndOfMessage;
                 };
 
-                var rr = sb.ToString();
+                var json = _messageBuffer.ToString();
 
                 try
                 {
-                    var data = JsonSerializer.Deserialize<DebuggerResult>(rr, _jso) ?? throw new ApplicationException("Unable to deserialise incoming data");
+                    var data = JsonSerializer.Deserialize<DebuggerResult>(json, _jso) ?? throw new ApplicationException("Unable to deserialise incoming data");
 
                     if (data.Error != null)
                     {

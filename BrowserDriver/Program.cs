@@ -2,7 +2,7 @@
 using BrowserDriver.Browsers;
 using BrowserDriver.States;
 
-using (var browser = BrowserConnectionFactory.Create())
+using (var browser = BrowserFactory.Create())
 {
     browser.Open("about:blank");
 
