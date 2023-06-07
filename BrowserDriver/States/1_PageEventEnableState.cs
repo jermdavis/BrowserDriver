@@ -14,7 +14,6 @@
 
         public override async Task Update(StateMachine owner, DebuggerResult data)
         {
-            // {"id":9,"result":{}}
             if (data != null && data.Id == _id)
             {
                 owner.TransitionToNewState(PageNavigateState.Instance);

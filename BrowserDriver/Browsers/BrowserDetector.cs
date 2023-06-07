@@ -5,8 +5,8 @@ namespace BrowserDriver.Browsers
     
     public abstract class BrowserDetector : IBrowserDetector
     {
-        public string Name { get; } = string.Empty;
-        public string AppFolder { get; } = string.Empty;
+        public string Name { get; init; }
+        public string AppFolder { get; init; } = string.Empty;
         public string AppExecutable { get; init; } = string.Empty;
         public bool Installed { get; init; } = false;
 

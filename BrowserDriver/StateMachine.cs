@@ -13,10 +13,9 @@ namespace BrowserDriver
         private readonly BrowserConnection _connection;
         private readonly ClientWebSocket _ws = new();
         private readonly CancellationTokenSource _ct = new();
-        private readonly JsonSerializerOptions _jso = new() { PropertyNamingPolicy = JsonNamingPolicy.CamelCase, WriteIndented = true };
         private State? _newState = null;
         private bool _running = true;
-        private readonly AutoResetEvent _ar = new(initialState: false);
+        private readonly AutoResetEvent _waitFlag = new(initialState: false);
         private readonly byte[] _byteBuffer = new byte[512];
         private readonly StringBuilder _messageBuffer = new();
 
@@ -43,8 +42,8 @@ namespace BrowserDriver
 
         public async Task Wait()
         {
-            _ar.WaitOne();
-            _ar.Dispose();
+            _waitFlag.WaitOne();
+            _waitFlag.Dispose();
 
             _running = false;
             _ct.Cancel();
@@ -70,7 +69,7 @@ namespace BrowserDriver
 
                 try
                 {
-                    var data = JsonSerializer.Deserialize<DebuggerResult>(json, _jso) ?? throw new ApplicationException("Unable to deserialise incoming data");
+                    var data = JsonSerializer.Deserialize<DebuggerResult>(json, Json.Options) ?? throw new ApplicationException("Unable to deserialise incoming data");
 
                     if (data.Error != null)
                     {
@@ -95,7 +94,7 @@ namespace BrowserDriver
         public async Task SendCommand<T>(T command, int id = 0) where T : IDebuggerCommandProperties
         {
             var cmd = new DebuggerCommand<T>(command) { Id = id };
-            var data = JsonSerializer.Serialize<DebuggerCommand<T>>(cmd, _jso);
+            var data = JsonSerializer.Serialize<DebuggerCommand<T>>(cmd, Json.Options);
             var bytes = Encoding.UTF8.GetBytes(data);
             await _ws.SendAsync(bytes, WebSocketMessageType.Text, true, _ct.Token);
         }
@@ -116,7 +115,7 @@ namespace BrowserDriver
 
         public async Task Error(DebuggerResult data)
         {
-            Console.WriteLine($">>\nError: {data.Error?.ToJsonString(_jso)}\n>>");
+            Console.WriteLine($">>\nError: {data.Error?.ToJsonString(Json.Options)}\n>>");
         }
 
         public void TransitionToNewState(State state)
@@ -124,7 +123,7 @@ namespace BrowserDriver
             _newState = state;
             if (state == NullState.Instance)
             {
-                _ar.Set();
+                _waitFlag.Set();
             }
         }
     }

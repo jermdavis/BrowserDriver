@@ -3,14 +3,10 @@ using System.Text.Json;
 
 namespace BrowserDriver.Browsers
 {
-    
+
     public class Browser : IDisposable
     {
         private static readonly HttpClient _client = new();
-        private static readonly JsonSerializerOptions _jso = new() {
-            PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
-            WriteIndented = true
-        };
 
         public string Name { get; init; }
         public string Folder { get; init; }
@@ -58,7 +54,7 @@ namespace BrowserDriver.Browsers
         {
             var result = await _client.GetAsync($"http://localhost:{DebuggerPort}/json");
             var content = await result.Content.ReadAsStringAsync();
-            var sessions = JsonSerializer.Deserialize<BrowserConnection[]>(content, _jso);
+            var sessions = JsonSerializer.Deserialize<BrowserConnection[]>(content, Json.Options);
 
             if (sessions == null || sessions.Length < 1)
             {
