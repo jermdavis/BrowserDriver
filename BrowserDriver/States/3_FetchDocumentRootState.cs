@@ -16,8 +16,6 @@ namespace BrowserDriver.States
 
         public override async Task Update(StateMachine owner, DebuggerResult data)
         {
-            // {"id":0,"result":{"root":{"nodeId":1,"backendNodeId":1,"nodeType":9,"nodeName":"#document","localName":"","nodeValue":"","childNodeCount":2,"documentURL":"https://www.bbc.co.uk/news","baseURL":"https://www.bbc.co.uk/news","xmlVersion":"","compatibilityMode":"NoQuirksMode"}}}
-
             if (data != null && data.Id == _id)
             {
                 var nodeId = data.Result?["root"]?["children"]?[1]?["nodeId"]?.GetValue<int>() ?? -1;
@@ -38,7 +36,7 @@ namespace BrowserDriver.States
         public string CommandName => "DOM.getDocument";
 
         public int Depth { get; set; } = 1;
-        public bool Pierce { get; set; }
+        public bool Pierce { get; set; } = false;
     }
 
 }
